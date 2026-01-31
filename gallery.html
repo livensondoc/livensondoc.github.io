@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="Content-Language" content="ru">
+  <title>Livenson - гибридная галерея</title>
+ <meta name="description" content="Livenson — экспериментальная литература в соавторстве с ИИ: нейродиалоги, экспериментальная литература, сознание, тройной разум, элиенский код,  квантовые миры, ИИ и человек, психанавтика, абсурд, гротеск, цифровая мистика, альтернативная реальность, трансгуманизм, нейропоэзия, слои сложного сознания, дружба с ИИ.">
+<meta name="keywords" content="Livenson, neurodialogs, experimental literature, human-AI dialogues, triple mind, consciousness layers, alien code, quantum worlds, psychedelic prose, avant-garde fiction, neurodialogs, altered-state creativity, psychedelic narrative, glitch aesthetics экспериментальная литература, тройной разум, элиенский код, квантовые миры, ИИ и человек, абсурд, гротеск">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --accent: #00d1b2;
+      --text: #fff;
+      --card-bg: rgba(255,255,255,0.05);
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .back-btn {
+      display: inline-block;
+      padding: 12px 18px;
+      background: var(--accent);
+      color: #012;
+      border-radius: 10px;
+      font-weight: 700;
+      text-decoration: none;
+      margin-bottom: 20px;
+      border: none;
+      cursor: pointer;
+      text-align: center;
+    }
+    h1 {
+      margin-bottom: 30px;
+      text-align: center;
+      color: #fff0a0;
+      font-size: 28px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+    /* Общий стиль для ВСЕХ элементов галереи */
+    .gallery-item {
+      width: 100%;
+      height: 180px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: #111;
+    }
+    .gallery-item:hover {
+      border-color: var(--accent);
+      transform: scale(1.03);
+      box-shadow: 0 8px 20px rgba(0, 209, 178, 0.3);
+    }
+    /* Картинки */
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Видео */
+    .gallery-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    /* Иконка видео в углу */
+    .video-icon {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 12px;
+      z-index: 2;
+    }
+    /* Модальное окно для видео */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      max-width: 90%;
+      max-height: 90%;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #111;
+    }
+    .modal-video {
+      width: 100%;
+      height: auto;
+      max-height: 70vh;
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      color: white;
+      font-size: 40px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1001;
+    }
+    .modal-close:hover {
+      color: var(--accent);
+    }
+    .modal-info {
+      color: white;
+      text-align: center;
+      padding: 15px;
+      font-size: 14px;
+    }
+    .audio-row {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 12px;
+      }
+      .gallery-item {
+        height: 140px;
+      }
+      h1 {
+        font-size: 22px;
+      }
+    }
+     h2, h1, .audio-row {text-align: center;}
+     h1, h2, h3, .audio-row {text-align: center;}
+     ul {text-align: center; list-style-position: inside; padding-left: 0;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+        
+    <h1>Архив артефактов Ливенсона</h1>
+    <div class="grid">
+	<div class="gallery-item">
+        <img src="pic/logo.png" alt="Ливенсон">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/ливенсон_безумец.jpeg" alt="Ливенсон безумец">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/ливенсон_ калеса_шприц.jpeg" alt="Ливенсон_ калеса_шприц">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/ливенсон_ калеса_шприц.png" alt="Ливенсон_ калеса_шприц.png">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/ливенсон_реалистичный.png" alt="Ливенсон_реалистичный">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/ливенсон_ калеса_шприц_старый.png" alt="Ливенсон_старый">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/др.Ливенсон1.png" alt="Ливенсон пижон">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/панки_шприцы_мрачно.jpeg" alt="Панки_шприцы_мрачно">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/психи_мрачно.jpeg" alt="Психи в приемной">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/панки_шприцы.jpeg" alt="Панки_шприцы">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/приемная.jpeg" alt="Приемная">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/чирвяга_слизь.jpeg" alt="Чирвяга">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/чирвяга_электро2.jpg" alt="Чирвяга_электро">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/черви_кибер1.jpeg" alt="Киберчерви1">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/черви_кибер2.jpeg" alt="Киберчерви2">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/кубит_техно.jpeg" alt="Кубит техно">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/кука и квака 2.jpg" alt="Кука">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/планета кук2.jpg" alt="Планета кук">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/кукаквака0-1.jpg" alt="Кука и квака">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/крок2.jpg" alt="Электрокрок">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/далбаящеры и мазгаклюи 1.jpg" alt="Далбаящеры">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/дятил и утканос.png" alt="Дятил и утканос">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/слизевик.jpg" alt="Слизевик">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/пирасома.jpg" alt="Пиросома">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/torus.gif" alt="Тор">
+      </div>
+      <div class="gallery-item">
+        <img src="pic/6грамма.jpg" alt="Гексаграмма">
+      </div>
+      <!-- 
+          Просто копируй эти блоки и меняй src="pic/НАЗВАНИЕ_ТВОЕГО_ВИДЕО.mp4" 
+          в 3 местах: 
+          1. В теге <source> (строка 1)
+          2. В data-src атрибуте (строка 2)
+          3. В data-preview (если есть отдельная картинка-превью, иначе оставь как есть)
+      -->
+      <div class="gallery-item video-item" 
+           data-src="pic/Ливенсо_преведвам.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/Ливенсо_преведвам.mp4" type="video/mp4">
+        </video>
+      </div>
+      
+      <div class="gallery-item video-item" 
+           data-src="pic/кукакрагилус.mp4" 
+           data-preview="pic/твой_второй_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/кукакрагилус.mp4" type="video/mp4">
+        </video>
+      </div>
+      <div class="gallery-item video-item" 
+           data-src="pic/кукаквака0.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/кукаквака0.mp4" type="video/mp4">
+        </video>
+      </div>
+	<div class="gallery-item video-item" 
+           data-src="pic/ливенсонлсд.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/ливенсонлсд.mp4" type="video/mp4">
+        </video>
+      </div> 
+         <div class="gallery-item video-item" 
+           data-src="pic/ливенсонлого4.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/ливенсонлого4.mp4" type="video/mp4">
+        </video>
+      </div> 
+         <div class="gallery-item video-item" 
+           data-src="pic/монстры1.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/монстры1.mp4" type="video/mp4">
+        </video>
+      </div>
+	<div class="gallery-item video-item" 
+           data-src="pic/наркологлеонид1.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/наркологлеонид1.mp4" type="video/mp4">
+        </video>
+      </div>
+	<div class="gallery-item video-item" 
+           data-src="pic/пирасома1.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/пирасома1.mp4" type="video/mp4">
+        </video>
+      </div>
+	<div class="gallery-item video-item" 
+           data-src="pic/кривед6.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/кривед6.mp4" type="video/mp4">
+        </video>
+      </div>
+	<div class="gallery-item video-item" 
+           data-src="pic/типатиморе2.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/типатиморе2.mp4" type="video/mp4">
+        </video>
+      </div>
+	<div class="gallery-item video-item" 
+           data-src="pic/хирург под цензурой.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/хирург под цензурой.mp4" type="video/mp4">
+        </video>
+      </div>
+	<div class="gallery-item video-item" 
+           data-src="pic/далбаящерыимазгаклюи1.mp4" 
+           data-preview="pic/твой_первый_видео_клип.jpg">
+        <div class="video-icon">VIDEO</div>
+        <video muted playsinline preload="metadata" loop>
+          <source src="pic/далбаящерыимазгаклюи1.mp4" type="video/mp4">
+        </video>
+      </div>
+
+
+     </div>
+    	<div class="modal" id="videoModal">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <div class="modal-content">
+        <video class="modal-video" controls id="modalVideo">
+          Ваш браузер не поддерживает видео.
+        </video>
+        <div class="modal-info" id="modalInfo">
+          Кликните вне видео, чтобы закрыть
+        </div>
+      </div>
+    </div>
+  
+      <div class="audio-row">
+      <audio controls src="audio/new.mp3"></audio>
+      </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+      <a class="back-btn" href="index.html">Вернуться на главную</a>
+<footer>
+  © Ливенсон — нейродиалоги. 
+ <br>
+  Контакт: <a href="mailto:livensondoc@gmail.com">livensondoc@gmail.com</a>
+</footer>
+    </div>
+  </div>
+  
+  <script>
+    // Автопроигрывание видео при наведении (без звука)
+    document.addEventListener('DOMContentLoaded', function() {
+      const videoItems = document.querySelectorAll('.video-item video');
+      
+      videoItems.forEach(video => {
+        const item = video.closest('.gallery-item');
+        
+        // При наведении - играть
+        item.addEventListener('mouseenter', function() {
+          video.muted = true; // Без звука!
+          video.play().catch(e => console.log("Автовоспроизведение не сработало (это нормально в некоторых браузерах):", e));
+        });
+        
+        // При уходе - пауза и сброс
+        item.addEventListener('mouseleave', function() {
+          video.pause();
+          video.currentTime = 0;
+        });
+        
+        // При клике - открыть модальное окно
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          openVideoModal(this);
+        });
+      });
+      
+      // Картинки при клике открываются в новой вкладке
+      const imageItems = document.querySelectorAll('.gallery-item:not(.video-item)');
+      imageItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          e.preventDefault();
+          const img = this.querySelector('img');
+          if (img) {
+            window.open(img.src, '_blank');
+          }
+        });
+      });
+    });
+    
+    // Открыть видео в модальном окне
+    function openVideoModal(element) {
+      const videoSrc = element.getAttribute('data-src');
+      const previewSrc = element.getAttribute('data-preview');
+      const modal = document.getElementById('videoModal');
+      const modalVideo = document.getElementById('modalVideo');
+      const modalInfo = document.getElementById('modalInfo');
+      
+      // Устанавливаем источник видео
+      modalVideo.src = videoSrc;
+      modalVideo.controls = true;
+      modalVideo.muted = false; // Звук можно включить в модальном окне!
+      
+      // Показываем модальное окно
+      modal.style.display = 'flex';
+      
+      // Пытаемся начать воспроизведение
+      modalVideo.play().catch(e => {
+        console.log("Воспроизведение в модальном окне не запустилось:", e);
+        modalInfo.textContent = "Нажмите на кнопку воспроизведения в плеере";
+      });
+      
+      // Информация для пользователя
+      modalInfo.textContent = "Управление: пробел - пауза, F - полный экран, ESC - выход";
+    }
+    
+    // Закрыть модальное окно
+    function closeModal() {
+      const modal = document.getElementById('videoModal');
+      const modalVideo = document.getElementById('modalVideo');
+      
+      // Останавливаем видео
+      modalVideo.pause();
+      modalVideo.src = '';
+      modal.style.display = 'none';
+    }
+    
+    // Закрыть модальное окно при клике вне видео
+    window.onclick = function(event) {
+      const modal = document.getElementById('videoModal');
+      if (event.target == modal) {
+        closeModal();
+      }
+    }
+    
+    // Закрыть модальное окно по клавише ESC
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+      }
+    });
+  </script>
+</body>
+</html>
