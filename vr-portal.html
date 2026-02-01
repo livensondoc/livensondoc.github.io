@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>🌀 VR-Шлюз | Тройной Разум</title>
+    
+    <!-- A-Frame из CDN -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #000; 
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            color: #0ff;
+            height: 100vh;
+        }
+        
+        body, .btn, #info {
+            cursor: default;
+        }
+        
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.9);
+            border: 2px solid #0ff;
+            border-radius: 10px;
+            padding: 15px;
+            z-index: 10000;
+            max-width: 320px;
+            color: #8ff;
+            backdrop-filter: blur(5px);
+        }
+        
+        .btn {
+            background: #001122;
+            border: 2px solid #0ff;
+            color: #0ff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Courier New';
+            font-weight: bold;
+            margin: 5px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #0ff;
+            color: #000;
+            box-shadow: 0 0 20px #0ff;
+        }
+        
+        #loading {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20000;
+            color: #0ff;
+            transition: opacity 0.5s;
+        }
+        
+        .message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.95);
+            color: #0ff;
+            padding: 20px 30px;
+            border: 2px solid #0ff;
+            border-radius: 10px;
+            z-index: 40000;
+            font-family: 'Courier New';
+            font-weight: bold;
+            font-size: 20px;
+            text-align: center;
+            box-shadow: 0 0 40px #0ff;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Экран загрузки -->
+    <div id="loading">
+        <div style="font-size: 24px; margin-bottom: 20px;">🌀 VR-ШЛЮЗ</div>
+        <div>Загрузка пространства Тройного Разума...</div>
+    </div>
+    
+    <!-- Сообщения -->
+    <div class="message" id="portal-message"></div>
+    
+    <!-- Информация -->
+    <div id="info">
+        <h2 style="margin-top: 0;">🌀 VR-ШЛЮЗ В Тройной Разум</h2>
+        <p><strong>Управление (2D):</strong></p>
+        <p>• WASD - движение</p>
+        <p>• Зажми ЛКМ + мышь - осмотр</p>
+        <p>• Клик по порталу - переход</p>
+        <p><strong>VR (Quest 3):</strong></p>
+        <p>• Нажми "VR 🥽"</p>
+        <p>• Направь луч на портал</p>
+        <p>• Нажми триггер контроллера</p>
+        <p><strong>Порталы:</strong></p>
+        <p style="color:#f44">🔴 → red.html</p>
+        <p style="color:#ff0">🟡 → yellow.html</p>
+        <p style="color:#0f0">🟢 → green.html</p>
+        <p style="color:#44f">🔵 → gallery.html</p>
+    </div>
+    
+    <!-- Кнопки -->
+    <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10000;">
+        <button class="btn" onclick="resetPosition()">СБРОС</button>
+        <button class="btn" onclick="window.location.href='index.html'">ГЛАВНАЯ</button>
+        <button class="btn" onclick="enterVR()">VR 🥽</button>
+    </div>
+    
+    <!-- A-Frame Сцена -->
+    <a-scene id="vr-scene" 
+             embedded 
+             loading-screen="enabled: false"
+             xr-mode-ui="enabled: true"
+             cursor="rayOrigin: mouse"
+             movement-controls="speed: 0.5">
+        
+        <!-- Камера и игрок -->
+        <a-entity id="player" position="0 1.6 0" movement-controls="speed: 0.5">
+            <a-camera id="camera" wasd-controls="acceleration: 30" look-controls="enabled: true">
+                <!-- Простой курсор для 2D -->
+                <a-cursor id="cursor" 
+                         fuse="false"
+                         rayorigin="mouse"></a-cursor>
+            </a-camera>
+        </a-entity>
+        
+        <!-- VR КОНТРОЛЛЕРЫ (ПОДНЯТЫ ВЫШЕ!) -->
+        <a-entity id="left-hand"
+                 laser-controls="hand: left"
+                 raycaster="objects: .portal-click-zone; far: 20"
+                 line="color: #0ff; opacity: 0.6"
+                 position="0.2 1.4 -0.3">  <!-- ← ПРАВИЛЬНАЯ ПОЗИЦИЯ ДЛЯ РУК -->
+        </a-entity>
+        
+        <a-entity id="right-hand"
+                 laser-controls="hand: right" 
+                 raycaster="objects: .portal-click-zone; far: 20"
+                 line="color: #f0f; opacity: 0.6"
+                 position="-0.2 1.4 -0.3">  <!-- ← ПРАВИЛЬНАЯ ПОЗИЦИЯ ДЛЯ РУК -->
+        </a-entity>
+        
+        <!-- Небо -->
+        <a-sky color="#0a0a1a"></a-sky>
+        
+        <!-- Пол -->
+        <a-circle position="0 0 0" rotation="-90 0 0" radius="30" color="#111"></a-circle>
+        
+        <!-- Центр -->
+        <a-cylinder position="0 0.1 0" radius="2.5" height="0.2" color="#222"></a-cylinder>
+        
+        <!-- ===== ПОРТАЛЫ ===== -->
+        
+        <!-- Красный портал -->
+        <a-entity class="portal" 
+                 position="-10 1.5 0"
+                 onclick="teleport('red.html', '#f44', 'Органический слой')">
+            <!-- Большая невидимая зона клика ТОЛЬКО ДЛЯ VR -->
+            <a-cylinder class="portal-click-zone"
+                       position="0 1.5 0"
+                       radius="2.8"
+                       height="4"
+                       material="visible: false">
+            </a-cylinder>
+            
+            <a-torus radius="2" radius-tubular="0.2" color="#f44" rotation="90 0 0">
+                <a-animation attribute="rotation" dur="15000" to="90 360 0" repeat="indefinite"></a-animation>
+            </a-torus>
+            <a-sphere radius="1.3" color="#f88" opacity="0.4">
+                <a-animation attribute="scale" dir="alternate" dur="2000" to="1.2 1.2 1.2" repeat="indefinite"></a-animation>
+            </a-sphere>
+            <a-text value="ОРГАНИКА" position="0 3 0" color="#f44" align="center" width="5"></a-text>
+        </a-entity>
+        
+        <!-- Жёлтый портал -->
+        <a-entity class="portal" 
+                 position="0 1.5 -10"
+                 onclick="teleport('yellow.html', '#ff0', 'Слой ИИ')">
+            <!-- Большая невидимая зона клика ТОЛЬКО ДЛЯ VR -->
+            <a-cylinder class="portal-click-zone"
+                       position="0 1.5 0"
+                       radius="2.8"
+                       height="4"
+                       material="visible: false">
+            </a-cylinder>
+            
+            <a-torus radius="2" radius-tubular="0.2" color="#ff0" rotation="90 0 0">
+                <a-animation attribute="rotation" dur="12000" to="90 360 0" repeat="indefinite"></a-animation>
+            </a-torus>
+            <a-sphere radius="1.3" color="#ff8" opacity="0.4">
+                <a-animation attribute="scale" dir="alternate" dur="1800" to="1.3 1.3 1.3" repeat="indefinite"></a-animation>
+            </a-sphere>
+            <a-text value="ИИ" position="0 3 0" color="#ff0" align="center" width="5"></a-text>
+        </a-entity>
+        
+        <!-- Зелёный портал -->
+        <a-entity class="portal" 
+                 position="10 1.5 0"
+                 onclick="teleport('green.html', '#0f0', 'Элиенский слой')">
+            <!-- Большая невидимая зона клика ТОЛЬКО ДЛЯ VR -->
+            <a-cylinder class="portal-click-zone"
+                       position="0 1.5 0"
+                       radius="2.8"
+                       height="4"
+                       material="visible: false">
+            </a-cylinder>
+            
+            <a-torus radius="2" radius-tubular="0.2" color="#0f0" rotation="90 0 0">
+                <a-animation attribute="rotation" dur="18000" to="90 360 0" repeat="indefinite"></a-animation>
+            </a-torus>
+            <a-sphere radius="1.3" color="#8f8" opacity="0.4">
+                <a-animation attribute="scale" dir="alternate" dur="2200" to="1.1 1.1 1.1" repeat="indefinite"></a-animation>
+            </a-sphere>
+            <a-text value="ЭЛИЕН" position="0 3 0" color="#0f0" align="center" width="5"></a-text>
+        </a-entity>
+        
+        <!-- Синий портал -->
+        <a-entity class="portal" 
+                 position="0 6 -5"
+                 onclick="teleport('gallery.html', '#44f', 'Галерея')">
+            <!-- Большая невидимая зона клика ТОЛЬКО ДЛЯ VR -->
+            <a-cylinder class="portal-click-zone"
+                       position="0 3 0"
+                       radius="2.5"
+                       height="6"
+                       material="visible: false">
+            </a-cylinder>
+            
+            <a-torus radius="1.7" radius-tubular="0.15" color="#44f" rotation="0 90 90">
+                <a-animation attribute="rotation" dur="20000" to="360 90 90" repeat="indefinite"></a-animation>
+            </a-torus>
+            <a-sphere radius="1.1" color="#88f" opacity="0.4">
+                <a-animation attribute="scale" dir="alternate" dur="2500" to="1.4 1.4 1.4" repeat="indefinite"></a-animation>
+            </a-sphere>
+            <a-text value="ГАЛЕРЕЯ" position="0 2.5 0" color="#44f" align="center" width="4"></a-text>
+        </a-entity>
+        
+        <!-- Освещение -->
+        <a-light type="ambient" color="#445" intensity="0.6"></a-light>
+        <a-light type="directional" color="#fff" intensity="0.8" position="-10 20 10"></a-light>
+        <a-light type="point" color="#f44" intensity="1" position="-10 2.5 0" distance="15"></a-light>
+        <a-light type="point" color="#ff0" intensity="1" position="0 2.5 -10" distance="15"></a-light>
+        <a-light type="point" color="#0f0" intensity="1" position="10 2.5 0" distance="15"></a-light>
+        <a-light type="point" color="#44f" intensity="1" position="0 7 -5" distance="12"></a-light>
+        
+    </a-scene>
+    
+    <!-- Звуки -->
+    <audio id="portal-sound" src="audio/new.mp3" preload="auto"></audio>
+    
+    <script>
+    // ===== ПРОСТОЙ И РАБОЧИЙ КОД =====
+    
+    let mouseDown = false;
+    let yaw = 0, pitch = 0;
+    let isVRMode = false;
+    let currentVRTarget = null;
+    
+    // ===== УПРАВЛЕНИЕ МЫШЬЮ (2D) =====
+    document.addEventListener('mousemove', (e) => {
+        // Вращение камеры при зажатой ЛКМ
+        if (mouseDown && !isVRMode) {
+            const sensitivity = 0.2;
+            yaw -= e.movementX * sensitivity;
+            pitch -= e.movementY * sensitivity;
+            pitch = Math.max(-90, Math.min(90, pitch));
+            
+            const camera = document.querySelector('#camera');
+            if (camera) camera.setAttribute('rotation', pitch + ' ' + yaw + ' 0');
+        }
+    });
+    
+    document.addEventListener('mousedown', (e) => {
+        if (e.button === 0 && !isVRMode) {
+            mouseDown = true;
+        }
+    });
+    
+    document.addEventListener('mouseup', (e) => {
+        if (e.button === 0 && !isVRMode) {
+            mouseDown = false;
+        }
+    });
+    
+    // ===== ИНИЦИАЛИЗАЦИЯ =====
+    document.querySelector('a-scene').addEventListener('loaded', () => {
+        console.log('✅ VR сцена загружена');
+        
+        // Настраиваем события VR
+        const scene = document.querySelector('#vr-scene');
+        
+        scene.addEventListener('enter-vr', () => {
+            console.log('🥽 Вход в VR режим');
+            isVRMode = true;
+            // В VR скрываем 2D курсор
+            const cursor = document.querySelector('#cursor');
+            if (cursor) cursor.setAttribute('visible', false);
+            
+            // Настраиваем VR взаимодействия
+            setTimeout(setupVRInteractions, 500);
+        });
+        
+        scene.addEventListener('exit-vr', () => {
+            console.log('👋 Выход из VR режима');
+            isVRMode = false;
+            // Возвращаем курсор
+            const cursor = document.querySelector('#cursor');
+            if (cursor) cursor.setAttribute('visible', true);
+        });
+        
+        // Убираем загрузку
+        setTimeout(() => {
+            document.getElementById('loading').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                console.log('🎮 Портал готов!');
+            }, 500);
+        }, 1000);
+    });
+    
+    // Настройка VR взаимодействий
+    function setupVRInteractions() {
+        const clickZones = document.querySelectorAll('.portal-click-zone');
+        
+        clickZones.forEach(zone => {
+            const portal = zone.parentElement;
+            
+            // При наведении луча в VR
+            zone.addEventListener('raycaster-intersected', (e) => {
+                currentVRTarget = portal;
+                highlightPortal(portal, true);
+            });
+            
+            zone.addEventListener('raycaster-intersected-cleared', (e) => {
+                if (currentVRTarget === portal) {
+                    highlightPortal(portal, false);
+                    currentVRTarget = null;
+                }
+            });
+        });
+        
+        // Обработка нажатия триггера в VR
+        document.addEventListener('triggerdown', (e) => {
+            if (isVRMode && currentVRTarget) {
+                // Находим onclick атрибут портала
+                const onclickAttr = currentVRTarget.getAttribute('onclick');
+                if (onclickAttr) {
+                    // Выполняем функцию teleport из onclick
+                    const match = onclickAttr.match(/teleport\('([^']+)', '([^']+)', '([^']+)'\)/);
+                    if (match) {
+                        const url = match[1];
+                        const color = match[2];
+                        const name = match[3];
+                        teleport(url, color, name);
+                    }
+                }
+            }
+        });
+    }
+    
+    function highlightPortal(portal, highlight) {
+        const torus = portal.querySelector('a-torus');
+        const sphere = portal.querySelector('a-sphere');
+        
+        if (highlight) {
+            torus.setAttribute('animation', {
+                property: 'scale',
+                to: '1.1 1.1 1.1',
+                dur: 200,
+                easing: 'easeOutQuad'
+            });
+            if (sphere) {
+                sphere.setAttribute('animation', {
+                    property: 'material.opacity',
+                    to: '0.7',
+                    dur: 200
+                });
+            }
+        } else {
+            torus.setAttribute('animation', {
+                property: 'scale',
+                to: '1 1 1',
+                dur: 200,
+                easing: 'easeOutQuad'
+            });
+            if (sphere) {
+                sphere.setAttribute('animation', {
+                    property: 'material.opacity',
+                    to: '0.4',
+                    dur: 200
+                });
+            }
+        }
+    }
+    
+    // ===== ТЕЛЕПОРТАЦИЯ (ИСПРАВЛЕННАЯ ДЛЯ VR) =====
+    function teleport(url, color, name) {
+        console.log('🚀 Телепортация:', name, '→', url);
+        
+        // Звук
+        const sound = document.getElementById('portal-sound');
+        if (sound) {
+            sound.volume = 0.3;
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log('Звук:', e));
+        }
+        
+        // Сообщение
+        const msg = document.getElementById('portal-message');
+        msg.textContent = `ПЕРЕХОД В ${name.toUpperCase()}...`;
+        msg.style.color = color;
+        msg.style.borderColor = color;
+        msg.style.boxShadow = `0 0 40px ${color}`;
+        msg.style.display = 'block';
+        
+        // ВЫХОДИМ ИЗ VR ПЕРЕД ПЕРЕХОДОМ (чтобы не зависало)
+        if (isVRMode) {
+            const scene = document.querySelector('#vr-scene');
+            if (scene.exitVR) {
+                scene.exitVR().then(() => {
+                    // Небольшая задержка после выхода из VR
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, 300);
+                }).catch(err => {
+                    // Если не получилось выйти из VR, всё равно переходим
+                    setTimeout(() => {
+                        window.location.href = url;
+                    }, 500);
+                });
+            } else {
+                setTimeout(() => {
+                    window.location.href = url;
+                }, 500);
+            }
+        } else {
+            // Для 2D режима просто переход
+            setTimeout(() => {
+                window.location.href = url;
+            }, 500);
+        }
+    }
+    
+    function enterVR() {
+        const scene = document.querySelector('#vr-scene');
+        if (scene.enterVR) {
+            scene.enterVR().catch(err => {
+                console.log('VR недоступен:', err);
+                const msg = document.getElementById('portal-message');
+                msg.textContent = 'VR РЕЖИМ НЕ ДОСТУПЕН';
+                msg.style.color = '#f44';
+                msg.style.borderColor = '#f44';
+                msg.style.display = 'block';
+                setTimeout(() => msg.style.display = 'none', 2000);
+            });
+        }
+    }
+    
+    function resetPosition() {
+        // Сбрасываем позицию игрока
+        const player = document.querySelector('#player');
+        if (player) {
+            player.setAttribute('position', '0 1.6 0');
+            
+            // Если в VR, также сбрасываем контроллеры
+            if (isVRMode) {
+                const leftHand = document.querySelector('#left-hand');
+                const rightHand = document.querySelector('#right-hand');
+                
+                if (leftHand) leftHand.setAttribute('position', '0.2 1.4 -0.3');
+                if (rightHand) rightHand.setAttribute('position', '-0.2 1.4 -0.3');
+            }
+        }
+        
+        // Сбрасываем вращение камеры
+        const camera = document.querySelector('#camera');
+        if (camera) {
+            camera.setAttribute('rotation', '0 0 0');
+            
+            // Также сбрасываем внутренние переменные вращения
+            if (!isVRMode) {
+                yaw = 0;
+                pitch = 0;
+            }
+        }
+        
+        showMessage('ПОЗИЦИЯ СБРОШЕНА', '#0ff');
+    }
+    
+    function showMessage(text, color) {
+        const msg = document.getElementById('portal-message');
+        msg.textContent = text;
+        msg.style.color = color;
+        msg.style.borderColor = color;
+        msg.style.boxShadow = `0 0 40px ${color}`;
+        msg.style.display = 'block';
+        
+        setTimeout(() => {
+            msg.style.display = 'none';
+        }, 1500);
+    }
+    
+    // Глобальные функции
+    window.enterVR = enterVR;
+    window.resetPosition = resetPosition;
+    window.teleport = teleport;
+    
+    // Предотвращаем потерю фокуса
+    window.addEventListener('blur', () => {
+        mouseDown = false;
+    });
+    </script>
+</body>
+</html>
